@@ -11,7 +11,7 @@
  *   Browser ↔ POST /api/token (server holds API key)
  */
 
-import { GoogleGenAI, Modality } from 'https://cdn.jsdelivr.net/npm/@google/genai@2.10.0/+esm';
+import { GoogleGenAI, Modality } from '@google/genai';
 
 // ══════════════════════════════════════════════════════════════════
 //  i18n — Languages + Currency
