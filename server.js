@@ -69,10 +69,13 @@ const searchHotelsDeclaration = {
 function buildLockedConfig(pref) {
   let systemInstruction = SYSTEM_PROMPT;
   if (pref) {
-    systemInstruction += `\n\nACTIVE LOCALE (set by the traveler): The traveler has chosen to talk in ${pref.language} and to see prices in ${pref.currency}.
-- Speak in ${pref.language}. If they clearly switch language mid-conversation, follow them, but otherwise default to ${pref.language}.
-- ALWAYS quote every price, fare, nightly rate and budget in ${pref.currency}. Never say amounts in US dollars unless the chosen currency is USD.
-- The flight/hotel search tools return prices in US dollars. Convert them to ${pref.currency} before speaking by multiplying the USD amount by approximately ${pref.rate}, and round to a natural-sounding figure.`;
+    systemInstruction += `
+
+⚠️ MANDATORY LANGUAGE AND CURRENCY CONSTRAINTS:
+1. Speak in ${pref.language}. If they speak in a different language, switch to it, but otherwise respond in ${pref.language}.
+2. ALL prices, fares, hotel rates, and budgets MUST be converted and quoted in ${pref.currency} (Rupees / ₹ for INR, or Euros for EUR, etc.).
+3. DO NOT output the dollar sign ($) or quote any prices in USD (US Dollars) under any circumstances.
+4. The flight/hotel search tools return prices in US dollars. You MUST convert them to ${pref.currency} before speaking or writing them, by multiplying the USD amount by approximately ${pref.rate}, and rounding to a natural-sounding figure. (e.g. Convert $100 USD to ${100 * pref.rate} ${pref.currency}). Always state the currency name explicitly.`;
   }
   return {
     responseModalities: [Modality.AUDIO],

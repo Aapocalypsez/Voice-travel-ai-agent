@@ -17,13 +17,13 @@ import { GoogleGenAI, Modality } from '@google/genai';
 //  i18n — Languages + Currency
 // ══════════════════════════════════════════════════════════════════
 const LANGUAGES = [
-  { code: 'English',    label: 'English',    flag: '🇺🇸', currency: 'USD', locale: 'en-US', rate: 1 },
-  { code: 'Español',    label: 'Español',    flag: '🇪🇸', currency: 'EUR', locale: 'es-ES', rate: 0.92 },
-  { code: 'Français',   label: 'Français',   flag: '🇫🇷', currency: 'EUR', locale: 'fr-FR', rate: 0.92 },
-  { code: 'Deutsch',    label: 'Deutsch',    flag: '🇩🇪', currency: 'EUR', locale: 'de-DE', rate: 0.92 },
-  { code: 'हिन्दी',      label: 'हिन्दी',      flag: '🇮🇳', currency: 'INR', locale: 'hi-IN', rate: 83 },
-  { code: '日本語',      label: '日本語',      flag: '🇯🇵', currency: 'JPY', locale: 'ja-JP', rate: 157 },
-  { code: 'Português',  label: 'Português',  flag: '🇧🇷', currency: 'BRL', locale: 'pt-BR', rate: 5.1 },
+  { code: 'English',    englishName: 'English',    label: 'English',    flag: '🇺🇸', currency: 'USD', locale: 'en-US', rate: 1 },
+  { code: 'Español',    englishName: 'Spanish',    label: 'Español',    flag: '🇪🇸', currency: 'EUR', locale: 'es-ES', rate: 0.92 },
+  { code: 'Français',   englishName: 'French',     label: 'Français',   flag: '🇫🇷', currency: 'EUR', locale: 'fr-FR', rate: 0.92 },
+  { code: 'Deutsch',    englishName: 'German',     label: 'Deutsch',    flag: '🇩🇪', currency: 'EUR', locale: 'de-DE', rate: 0.92 },
+  { code: 'हिन्दी',      englishName: 'Hindi',      label: 'हिन्दी',      flag: '🇮🇳', currency: 'INR', locale: 'hi-IN', rate: 83 },
+  { code: '日本語',      englishName: 'Japanese',   label: '日本語',      flag: '🇯🇵', currency: 'JPY', locale: 'ja-JP', rate: 157 },
+  { code: 'Português',  englishName: 'Portuguese', label: 'Português',  flag: '🇧🇷', currency: 'BRL', locale: 'pt-BR', rate: 5.1 },
 ];
 
 const DEFAULT_LANG = LANGUAGES[0];
@@ -579,7 +579,7 @@ async function connect() {
     const res = await fetch('/api/token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ language: currentLang.code, currency: currentLang.currency, rate: currentLang.rate }),
+      body: JSON.stringify({ language: currentLang.englishName, currency: currentLang.currency, rate: currentLang.rate }),
     });
     if (!res.ok) {
       const body = await res.json().catch(() => ({}));
