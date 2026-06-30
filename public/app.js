@@ -284,6 +284,17 @@ const transcriptSection = $('transcriptSection');
 const transcriptList    = $('transcriptList');
 const activityList      = $('activityList');
 
+// Docked mic elements
+const dockedMic         = $('dockedMic');
+const btnMicDocked      = $('btnMicDocked');
+const iconMicDocked     = $('iconMicDocked');
+const iconMicOffDocked  = $('iconMicOffDocked');
+const iconSpinnerDocked = $('iconSpinnerDocked');
+const dockRing1         = $('dockRing1');
+const dockRing2         = $('dockRing2');
+const statusLineDocked  = $('statusLineDocked');
+const btnEndDocked      = $('btnEndDocked');
+
 // ══════════════════════════════════════════════════════════════════
 //  State
 // ══════════════════════════════════════════════════════════════════
@@ -306,6 +317,8 @@ let userTurnAt = null;
 let awaitingFirstAudio = false;
 let idCounter = 0;
 let currentLang = DEFAULT_LANG;
+let uiPhase = 'idle';        // idle | listening | conversing | split
+let hasTransitionedToSplit = false;
 
 // Restore saved language
 const savedLang = localStorage.getItem('avery-lang');
@@ -333,6 +346,16 @@ function log(type, detail, latencyMs) {
 }
 
 // ══════════════════════════════════════════════════════════════════
+//  Phase Management
+// ══════════════════════════════════════════════════════════════════
+function setPhase(newPhase) {
+  if (uiPhase === newPhase) return;
+  uiPhase = newPhase;
+  document.getElementById('app').dataset.phase = newPhase;
+  renderUI();
+}
+
+// ══════════════════════════════════════════════════════════════════
 //  Rendering
 // ══════════════════════════════════════════════════════════════════
 function renderUI() {
@@ -351,21 +374,38 @@ function renderUI() {
   else if (isLive)         btnMic.classList.add('orb-btn--live');
   else                     btnMic.classList.add('orb-btn--idle');
 
-  // Icons
+  // Icons (hero)
   iconMic.classList.toggle('hidden', isConnecting || (isLive && muted));
   iconMicOff.classList.toggle('hidden', !(isLive && muted));
   iconSpinner.classList.toggle('hidden', !isConnecting);
 
-  // Status line
+  // Icons (docked)
+  iconMicDocked.classList.toggle('hidden', isConnecting || (isLive && muted));
+  iconMicOffDocked.classList.toggle('hidden', !(isLive && muted));
+  iconSpinnerDocked.classList.toggle('hidden', !isConnecting);
+
+  // Docked orb rings + button style
+  const dockOrbActive = isLive && (agentSpeaking || !muted);
+  dockRing1.classList.toggle('hidden', !dockOrbActive);
+  dockRing2.classList.toggle('hidden', !dockOrbActive);
+  btnMicDocked.disabled = isConnecting;
+  btnMicDocked.className = 'orb-btn orb-btn--docked';
+  if (isLive && muted)     btnMicDocked.classList.add('orb-btn--muted');
+  else if (isLive)         btnMicDocked.classList.add('orb-btn--live');
+  else                     btnMicDocked.classList.add('orb-btn--idle');
+
+  // Status line (hero + docked)
   if (status === 'idle')                                        statusLine.innerHTML = 'Tap to connect';
   else if (isConnecting)                                        statusLine.innerHTML = 'Connecting…';
   else if (isLive && agentSpeaking)                             statusLine.innerHTML = '<span class="status-primary">Avery is speaking…</span>';
   else if (isLive && !agentSpeaking && !muted)                  statusLine.innerHTML = '<span class="status-accent">Listening… go ahead</span>';
   else if (isLive && !agentSpeaking && muted)                   statusLine.innerHTML = 'Muted — tap the mic to talk';
   else if (status === 'error')                                  statusLine.innerHTML = `<span class="status-error">${errorMessage || 'Error'}</span>`;
+  statusLineDocked.innerHTML = statusLine.innerHTML;
 
-  // End button
+  // End button (hero + docked)
   btnEnd.classList.toggle('hidden', !isLive);
+  btnEndDocked.classList.toggle('hidden', !isLive);
 
   // Suggestions
   suggestions.classList.toggle('hidden', status !== 'idle');
@@ -518,6 +558,7 @@ function handleMessage(message) {
       const latency = Date.now() - userTurnAt;
       log('latency', 'Time to first agent audio', latency);
       awaitingFirstAudio = false;
+      if (uiPhase === 'listening') setPhase('conversing');
     }
     player?.enqueue(audio);
   }
@@ -534,6 +575,7 @@ function handleMessage(message) {
     agentBuf += content.outputTranscription.text;
     liveAgent = agentBuf;
     renderTranscript();
+    if (uiPhase === 'listening') setPhase('conversing');
   }
 
   // Tool calls
@@ -546,6 +588,7 @@ function handleMessage(message) {
         flightsData = result;
         renderFlights(result);
         renderUI();
+        if (!hasTransitionedToSplit) { hasTransitionedToSplit = true; setPhase('split'); }
         return { id: fc.id, name: fc.name, response: { result } };
       }
       if (fc.name === 'search_hotels') {
@@ -555,6 +598,7 @@ function handleMessage(message) {
         hotelsData = result;
         renderHotels(result);
         renderUI();
+        if (!hasTransitionedToSplit) { hasTransitionedToSplit = true; setPhase('split'); }
         return { id: fc.id, name: fc.name, response: { result } };
       }
       return { id: fc.id, name: fc.name, response: { error: 'Unknown tool' } };
@@ -570,6 +614,15 @@ function handleMessage(message) {
 }
 
 async function connect() {
+  // Reset for new session
+  transcript = [];
+  logs = [];
+  flightsData = null;
+  hotelsData = null;
+  hasTransitionedToSplit = false;
+  renderTranscript();
+  renderActivity();
+
   status = 'connecting';
   errorMessage = null;
   renderUI();
@@ -621,6 +674,7 @@ async function connect() {
 
     status = 'live';
     muted = false;
+    setPhase('listening');
     renderUI();
     log('session', 'Connected. Say hi to Avery!');
   } catch (err) {
@@ -647,6 +701,9 @@ function disconnect() {
   status = 'idle';
   muted = false;
   agentSpeaking = false;
+  uiPhase = 'idle';
+  hasTransitionedToSplit = false;
+  document.getElementById('app').dataset.phase = 'idle';
   renderUI();
   renderTranscript();
   log('session', 'Disconnected.');
@@ -689,6 +746,12 @@ btnMic.addEventListener('click', () => {
 });
 
 btnEnd.addEventListener('click', disconnect);
+
+btnMicDocked.addEventListener('click', () => {
+  if (status === 'live') toggleMute();
+});
+
+btnEndDocked.addEventListener('click', disconnect);
 
 // Initial render
 renderUI();
