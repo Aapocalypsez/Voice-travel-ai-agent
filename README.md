@@ -21,10 +21,10 @@ Avery is a warm, real-time voice travel agent designed to help travelers plan fl
 
 ```mermaid
 graph TD
-    A[Browser Mic / Speakers] <-->|Raw PCM Audio Data| B[WebSocket Connection]
-    B <-->|Live API Client| C[Gemini Live API Endpoint]
-    D[Express Server] --->|Mints Ephemeral Token| B
-    D -.->|GEMINI_API_KEY| E[Google AI Studio]
+    ExpressServer[Express Server] -->|GEMINI_API_KEY| GoogleAIStudio[Google AI Studio]
+    ExpressServer -->|Mints Ephemeral Token| WebSocketConnection[WebSocket Connection]
+    BrowserMic[Browser Mic / Speakers] <-->|Raw PCM Audio Data| WebSocketConnection
+    WebSocketConnection <-->|Live API Client| GeminiLiveAPI[Gemini Live API Endpoint]
 ```
 
 *   **Client**: Vanilla HTML5, CSS Custom Properties, and ES Module Javascript compiled into `public/bundle.js`.
