@@ -14,7 +14,7 @@ import { GoogleGenAI, Modality } from '@google/genai';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = process.env.PORT || 3000;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const LIVE_MODEL = 'gemini-2.5-flash-native-audio-latest';
+const LIVE_MODEL = 'gemini-3.1-flash-live-preview';
 
 if (!GEMINI_API_KEY) {
   console.error('\n❌  GEMINI_API_KEY is not set. Copy .env.example to .env and add your key.\n');

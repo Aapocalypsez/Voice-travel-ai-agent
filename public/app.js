@@ -178,7 +178,7 @@ class AudioRecorder {
     });
     this.ctx = new AudioContext({ sampleRate: 16000 });
     this.source = this.ctx.createMediaStreamSource(this.stream);
-    this.processor = this.ctx.createScriptProcessor(4096, 1, 1);
+    this.processor = this.ctx.createScriptProcessor(2048, 1, 1);
     this.processor.onaudioprocess = (e) => {
       const input = e.inputBuffer.getChannelData(0);
       const pcm = floatTo16BitPCM(input);
