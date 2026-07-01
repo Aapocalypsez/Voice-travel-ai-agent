@@ -1,10 +1,10 @@
-# Avery — Voice Travel Agent ✈️🗣️
+# Avery — Voice Travel Agent 
 
 Avery is a warm, real-time voice travel agent designed to help travelers plan flights, hotels, itineraries, packing lists, and budgets. Built as a high-performance **Single-Page Application (SPA)**, Avery utilizes the native bidirectionality of Google's **Gemini 3.1 Live API** (`gemini-3.1-flash-live-preview`) to deliver fluid, ultra-low latency, human-like voice interactions.
 
 ---
 
-## 🌟 Key Features
+## Key Features
 
 *   **Real-time Conversational Voice**: Speech-to-speech interaction using Gemini 3.1 Live with native audio input/output (no intermediary text-to-speech delays).
 *   **Active Locales & Currency Formatting**: Speak in English, Spanish, French, German, Hindi, Japanese, or Portuguese. All prices, night rates, and flight costs are automatically converted to your local currency (USD, EUR, INR, JPY, BRL) using real-time mock conversion rates.
@@ -17,7 +17,7 @@ Avery is a warm, real-time voice travel agent designed to help travelers plan fl
 
 ---
 
-## 🛠️ Architecture
+##  Architecture
 
 ```mermaid
 graph TD
@@ -32,7 +32,7 @@ graph TD
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### 1. Prerequisites
 
@@ -77,7 +77,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser, allow micro
 
 ---
 
-## 📂 Project Structure
+##  Project Structure
 
 ```
 ├── public/                 # Static frontend assets
@@ -93,7 +93,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser, allow micro
 
 ---
 
-## 🤝 Persona & Guardrails
+##  Persona & Guardrails
 
 Avery is locked into a strict helpful persona server-side:
 *   Avery will decline off-topic requests (code writing, math homework, recipes) warmly and guide the user back to travel topics.
